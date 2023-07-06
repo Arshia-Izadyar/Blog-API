@@ -5,8 +5,9 @@ from rest_framework import status
 from django.core.exceptions import ValidationError
 
 
-from .models import PostModel, CommentModel
-from .serializers import PostSerializer, CommentSerializer
+from .permissions import IsAuthorOrReadOnly
+from .models import PostModel, CommentModel, LikeModel, DisLikeModel
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer, DislikeSerializer
 
 
 class PostListCreateView(ListCreateAPIView):
@@ -20,8 +21,7 @@ class PostListCreateView(ListCreateAPIView):
 
 
 class DetailPost(RetrieveUpdateDestroyAPIView):
-    # model = PostModel
-    permission_classes = []
+    permission_classes = [IsAuthorOrReadOnly]
     serializer_class = PostSerializer
 
     def get_queryset(self):
@@ -43,3 +43,25 @@ class AddComment(CreateAPIView):
             serializer.save(user=user, post=post)
         else:
             return Response({"Erorr": " can't add more that 3 comments"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class AddLike(CreateAPIView):
+    model = LikeModel
+    permission_classes = [IsAuthenticated]
+    serializer_class = LikeSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs["pk"]
+        post = PostModel.objects.get(pk=pk)
+        serializer.save(user=self.request.user, post=post)
+
+
+class AddDisLike(CreateAPIView):
+    model = DisLikeModel
+    permission_classes = [IsAuthenticated]
+    serializer_class = DislikeSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs["pk"]
+        post = PostModel.objects.get(pk=pk)
+        serializer.save(user=self.request.user, post=post)

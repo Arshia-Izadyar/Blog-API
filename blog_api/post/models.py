@@ -46,7 +46,7 @@ class LikeModel(models.Model):
 class DisLikeModel(models.Model):
     user = models.ForeignKey(User, related_name="dislikes", on_delete=models.CASCADE)
     post = models.ForeignKey(PostModel, related_name="dislikes", on_delete=models.CASCADE)
-    like = models.BooleanField(default=False)
+    dislike = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.post)
