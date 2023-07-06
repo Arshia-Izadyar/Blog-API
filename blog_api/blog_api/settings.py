@@ -150,17 +150,13 @@ REST_AUTH_REGISTER_SERIALIZERS  = {
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
     
 }
+
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        # 'users.serializers.CsrfExemptSessionAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
-}
 
 AUTHENTICATION_BACKENDS = (
    "django.contrib.auth.backends.ModelBackend",
@@ -168,8 +164,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-
-
+# PASSWORD_CHANGE_SERIALIZER
+# CustomPasswordResetConfirmSerializer
 
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_HOST = "smtp.gmail.com"
