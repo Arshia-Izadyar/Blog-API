@@ -6,16 +6,23 @@ from .models import PostModel, CommentModel
 
 User = get_user_model()
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name')
-        
-        
+        fields = ("username", "first_name", "last_name")
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = CommentModel
-        fields = ('comment',)
+        fields = (
+            "user",
+            "comment",
+        )
+
 
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
@@ -23,6 +30,4 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostModel
-        fields = ('id', 'title', 'body','author', 'comments')
-        
-        
+        fields = ("id", "title", "body", "author", "comments")
