@@ -41,6 +41,9 @@ class LikeModel(models.Model):
 
     def __str__(self):
         return str(self.post)
+    
+    class Meta:
+        unique_together = ["user", "post"]
 
 
 class DisLikeModel(models.Model):

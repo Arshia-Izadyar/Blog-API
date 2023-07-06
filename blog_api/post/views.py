@@ -2,8 +2,6 @@ from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveUp
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.core.exceptions import ValidationError
-
 
 from .permissions import IsAuthorOrReadOnly
 from .models import PostModel, CommentModel, LikeModel, DisLikeModel
@@ -39,6 +37,7 @@ class AddComment(CreateAPIView):
         user = self.request.user
         pk = self.kwargs["pk"]
         post = PostModel.objects.get(pk=pk)
+        # post = get_object_or_404(PostModel, pk)
         if post.allow_comment(user):
             serializer.save(user=user, post=post)
         else:
