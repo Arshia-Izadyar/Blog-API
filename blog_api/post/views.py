@@ -29,8 +29,10 @@ class DetailPost(RetrieveUpdateDestroyAPIView):
 
 class AddComment(CreateAPIView):
     model = CommentModel
-    queryset = CommentModel.objects # added query set to prevent swagger error: (view's AddComment raised exception during schema generation)
-    
+    queryset = (
+        CommentModel.objects
+    )  # added query set to prevent swagger error: (view's AddComment raised exception during schema generation)
+
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
 
