@@ -1,7 +1,7 @@
 # Blog-API 📃
 
 
-Simple Blog-Api made with django rest-framework
+Simple Blog-Api made with django rest-framework Done 1 day
 
 Users can like and add comment to plog posts
 
