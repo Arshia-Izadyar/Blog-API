@@ -23,13 +23,14 @@ class DetailPost(RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        pk = self.kwargs["pk"]
-        print(pk)
+        pk = self.kwargs.get("pk")
         return PostModel.objects.filter(pk=pk)
 
 
 class AddComment(CreateAPIView):
     model = CommentModel
+    queryset = CommentModel.objects # added query set to prevent swagger error: (view's AddComment raised exception during schema generation)
+    
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
 
@@ -46,6 +47,7 @@ class AddComment(CreateAPIView):
 
 class AddLike(CreateAPIView):
     model = LikeModel
+    queryset = LikeModel.objects
     permission_classes = [IsAuthenticated]
     serializer_class = LikeSerializer
 
@@ -57,6 +59,8 @@ class AddLike(CreateAPIView):
 
 class AddDisLike(CreateAPIView):
     model = DisLikeModel
+    queryset = DisLikeModel.objects
+
     permission_classes = [IsAuthenticated]
     serializer_class = DislikeSerializer
 
