@@ -1,5 +1,3 @@
-# Blog-API 📃
-
 
 Simple Blog-Api made with django rest-framework Done in 1 day
 
@@ -39,7 +37,8 @@ posts CRUD is available in /post/
 
 ## Swagger Shema 
 
-![image](https://github.com/Arshia-Izadyar/Blog-API/assets/110552657/f4c84f81-c20b-4c05-bc5f-2c11df721b5e)
+![252020734-ef3a4f81-56e9-49a8-85d7-47cb0fb3672a](https://github.com/Arshia-Izadyar/adv-Blog-API/assets/110552657/a92d9df2-6dd8-41b7-87ea-985860d7d26b)
+
 
 
 ## How use Blog-API 🤔
