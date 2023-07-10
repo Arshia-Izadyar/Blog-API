@@ -1,14 +1,17 @@
-from rest_auth.registration.serializers import RegisterSerializer
+from django.utils.encoding import force_text
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import get_user_model
+
+from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
 
-from django.contrib.auth import get_user_model
-from rest_auth.serializers import PasswordResetConfirmSerializer
+from rest_auth.serializers import UserDetailsSerializer
+from rest_auth.registration.serializers import RegisterSerializer
 
-from django.utils.http import urlsafe_base64_decode as uid_decoder
-from rest_framework.exceptions import ValidationError
-from django.utils.encoding import force_text
-
+from post.serializers import CommentSerializer 
 
 User = get_user_model()
 
@@ -46,35 +49,33 @@ class CustomRegisterSerializer(RegisterSerializer):
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         pass
+    
+    
+    
+class CustomUserDetailsSerializer(UserDetailsSerializer):
+    comments = serializers.SerializerMethodField()
+    
+    def get_comments(self, obj):
+        req = self.context.get('request')
+        comments = obj.comments.filter(user=req.user)
+        comments_seriallizer = CommentSerializer(comments, many=True)
+        return comments_seriallizer.data
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        return rep
+    
+    class Meta:
+        model = User
+        fields = ('pk', 'username', 'email', 'first_name', 'last_name', 'comments')
+        read_only_fields = ('email', )
 
 
-# class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
-#     new_password1 = serializers.CharField(max_length=128)
-#     new_password2 = serializers.CharField(max_length=128)
-
-#     def validate(self, attrs):
-#         self._errors = {}
-
-#         try:
-#             uid = force_text(uid_decoder(attrs['uidb64']))
-#             self.user = User._default_manager.get(pk=uid)
-#         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-#                 raise ValidationError({'uid': ['Invalid value']})
-#         return super().validate(attrs)
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from rest_framework.validators import UniqueValidator
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-
-class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+class CustomPasswordResetConfirmSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
+    
+    set_password_form_class = SetPasswordForm
 
     def validate(self, attrs):
         self._errors = {}
@@ -86,11 +87,21 @@ class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
             self.user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise ValidationError({"uid": ["Invac value"]})
+        
+        self.set_password_form = self.set_password_form_class(
+            user=self.user, data=attrs
+        )
 
-        if not default_token_generator.check_token(self.user, token):
-            raise ValidationError({"token": ["Invalid or expired token"]})
+        
+        
+        if not self.set_password_form.is_valid():
+            raise serializers.ValidationError(self.set_password_form.errors)
+       
 
         attrs["new_password1"] = attrs["new_password1"].strip()
         attrs["new_password2"] = attrs["new_password2"].strip()
 
         return super().validate(attrs)
+
+    def save(self):
+        return self.set_password_form.save()

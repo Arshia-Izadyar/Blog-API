@@ -1,5 +1,6 @@
 from django.urls import path, include
 from django.conf.urls import url
+
 from rest_auth.views import (
     LoginView,
     LogoutView,
@@ -8,6 +9,8 @@ from rest_auth.views import (
     PasswordResetView,
     PasswordResetConfirmView,
 )
+
+
 
 
 urlpatterns = [
